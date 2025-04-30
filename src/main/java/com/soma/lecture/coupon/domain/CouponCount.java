@@ -1,6 +1,5 @@
 package com.soma.lecture.coupon.domain;
 
-import com.soma.lecture.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,7 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,13 +14,10 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Coupon extends BaseEntity {
-
-    private static final int COUPON_VALIDITY_DAYS = 60;
+public class CouponCount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_id")
     private Long id;
 
     @Column(nullable = false)
@@ -30,10 +25,14 @@ public class Coupon extends BaseEntity {
     private Type type;
 
     @Column(nullable = false)
-    private LocalDateTime expiredAt;
+    private int totalCount = 0;
 
-    public Coupon(Type type) {
+    @Column(nullable = false)
+    private int remainCount = 0;
+
+    public CouponCount(final Type type, final int totalCount) {
         this.type = type;
-        this.expiredAt = LocalDateTime.now().plusDays(COUPON_VALIDITY_DAYS);
+        this.totalCount = totalCount;
+        this.remainCount = totalCount;
     }
 }

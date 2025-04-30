@@ -1,12 +1,12 @@
 package com.soma.lecture.coupon.controller.request;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.util.List;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 
 public record CouponCreateRequest(
-        @NotNull(message = "생성할 쿠폰을 입력해주세요")
-        @Valid
-        List<CouponRequest> coupons
-){
+        @NotBlank(message = "쿠폰 타입을 입력해주세요")
+        String type,
+        @Min(value = 1, message = "0보다 큰 숫자를 입력해주세요")
+        int count
+) {
 }
