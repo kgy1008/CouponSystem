@@ -1,4 +1,4 @@
-package com.soma.lecture.member.domain;
+package com.soma.lecture.users.domain;
 
 import com.soma.lecture.BaseEntity;
 import jakarta.persistence.Column;
@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
+    private static final Role DEFAULT_ROLE = Role.MEMBER;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -31,4 +33,10 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    public Member(String email, String password) {
+        this.email = email;
+        this.password = password;
+        this.role = DEFAULT_ROLE;
+    }
 }

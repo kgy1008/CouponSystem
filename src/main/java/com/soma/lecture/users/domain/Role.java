@@ -1,4 +1,4 @@
-package com.soma.lecture.member.domain;
+package com.soma.lecture.users.domain;
 
 public enum Role {
     MEMBER,

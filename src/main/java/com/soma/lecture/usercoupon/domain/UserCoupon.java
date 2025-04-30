@@ -2,7 +2,7 @@ package com.soma.lecture.usercoupon.domain;
 
 import com.soma.lecture.BaseEntity;
 import com.soma.lecture.coupon.domain.Coupon;
-import com.soma.lecture.member.domain.Member;
+import com.soma.lecture.users.domain.Member;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
