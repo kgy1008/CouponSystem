@@ -1,10 +1,11 @@
 package com.soma.lecture.coupon.controller.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record CouponRequest(
-        @NotNull(message = "쿠폰 타입을 입력해주세요")
+        @NotBlank(message = "쿠폰 타입을 입력해주세요")
         String type,
         @Min(value = 1, message = "0보다 큰 숫자를 입력해주세요")
         int count
