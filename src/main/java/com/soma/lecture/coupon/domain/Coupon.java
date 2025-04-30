@@ -18,6 +18,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Coupon extends BaseEntity {
 
+    private static final int COUPON_VALIDITY_DAYS = 60;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "coupon_id")
@@ -35,4 +37,11 @@ public class Coupon extends BaseEntity {
 
     @Column(nullable = false)
     private LocalDateTime expiredAt;
+
+    public Coupon(int totalCount, Type type) {
+        this.totalCount = totalCount;
+        this.remainCount = totalCount;
+        this.type = type;
+        this.expiredAt = LocalDateTime.now().plusDays(COUPON_VALIDITY_DAYS);
+    }
 }
