@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,4 +46,7 @@ public class UserCoupon extends BaseEntity {
 
     @Column(nullable = false)
     private boolean isUsed = false;
+
+    @Column(nullable = true)
+    private LocalDateTime usedAt;
 }

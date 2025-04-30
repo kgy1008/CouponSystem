@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +32,9 @@ public class Coupon extends BaseEntity {
 
     @Column(nullable = false)
     private LocalDateTime expiredAt;
+
+    @Column(nullable = false)
+    private UUID couponUuid = UUID.randomUUID();
 
     public Coupon(Type type) {
         this.type = type;
