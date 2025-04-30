@@ -1,6 +1,6 @@
 package com.soma.lecture.coupon.domain;
 
-import com.soma.lecture.BaseEntity;
+import com.soma.lecture.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

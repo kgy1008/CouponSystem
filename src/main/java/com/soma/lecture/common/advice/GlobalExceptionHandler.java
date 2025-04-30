@@ -1,4 +1,4 @@
-package com.soma.lecture.common;
+package com.soma.lecture.common.advice;
 
 import com.soma.lecture.common.exception.BadRequestException;
 import com.soma.lecture.common.exception.ConflictException;
