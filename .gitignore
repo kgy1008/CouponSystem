@@ -5,6 +5,12 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+### macOS ###
+# General
+.DS_Store
+.AppleDouble
+.LSOverride
+
 ### STS ###
 .apt_generated
 .classpath
