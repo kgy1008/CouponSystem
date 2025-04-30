@@ -2,10 +2,14 @@ package com.soma.lecture.users.service;
 
 import com.soma.lecture.common.exception.BadRequestException;
 import com.soma.lecture.common.exception.ConflictException;
+import com.soma.lecture.common.exception.NotFoundException;
+import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
-import com.soma.lecture.users.controller.request.MemberCreateRequest;
+import com.soma.lecture.users.controller.request.MemberRequest;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.repository.MemberRepository;
+import com.soma.lecture.users.service.response.UserLoginResponse;
+import jakarta.validation.Valid;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,14 +25,19 @@ public class UserService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public void signUp(final MemberCreateRequest request) {
-        validateEmail(request.email());
+    public void signUp(final MemberRequest request) {
+        checkDuplicated(request.email());
         String encodedPassword = generateEncodedPassword(request.password());
         Member member = new Member(request.email(), encodedPassword);
         memberRepository.save(member);
     }
 
-    private void validateEmail(final String email) {
+    public UserLoginResponse login(final @Valid MemberRequest request) {
+        Member member = validateInfo(request.email(), request.password());
+        return new UserLoginResponse(member.getUserUuid(), member.getRole());
+    }
+
+    private void checkDuplicated(final String email) {
         boolean exists = memberRepository.existsByEmail(email);
         if (exists) {
             throw new ConflictException(ErrorCode.MEMBER_CONFLICT);
@@ -47,5 +56,19 @@ public class UserService {
         if (!VALID_PASSWORD_PATTERN.matcher(rawPassword).matches()) {
             throw new BadRequestException(ErrorCode.PASSWORD_FORMAT_EXCEPTION);
         }
+    }
+
+    private Member validateInfo(final String email, final String password) {
+        Member member = findMemberByEmail(email);
+
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new UnauthorizedException(ErrorCode.PASSWORD_INVALID);
+        }
+        return member;
+    }
+
+    private Member findMemberByEmail(final String email) {
+        return memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
     }
 }
