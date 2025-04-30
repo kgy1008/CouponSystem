@@ -1,12 +1,11 @@
 package com.soma.lecture.coupon.controller;
 
+import com.soma.lecture.common.response.ApiResponse;
+import com.soma.lecture.common.response.SuccessCode;
 import com.soma.lecture.coupon.controller.request.CouponCreateRequest;
 import com.soma.lecture.coupon.service.CouponService;
-import com.soma.lecture.coupon.service.response.CouponCreateResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,9 +19,9 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("/admin")
-    public ResponseEntity<CouponCreateResponse> create(@RequestBody @Valid CouponCreateRequest request) {
-        CouponCreateResponse response = couponService.createCoupons(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ApiResponse<Void> create(@RequestBody @Valid CouponCreateRequest request) {
+        couponService.createCoupons(request);
+        return ApiResponse.success(SuccessCode.COUPON_CREATED);
     }
 
 }

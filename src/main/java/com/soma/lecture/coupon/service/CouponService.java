@@ -6,8 +6,6 @@ import com.soma.lecture.coupon.domain.CouponCount;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.domain.repository.CouponCountRepository;
 import com.soma.lecture.coupon.domain.repository.CouponRepository;
-import com.soma.lecture.coupon.service.response.CouponCreateResponse;
-import com.soma.lecture.coupon.service.response.vo.CreatedCoupon;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -20,24 +18,24 @@ public class CouponService {
     private final CouponRepository couponRepository;
     private final CouponCountRepository couponCountRepository;
 
-    public CouponCreateResponse createCoupons(CouponCreateRequest request) {
+    public void createCoupons(final CouponCreateRequest request) {
         Type type = Type.from(request.type());
         int count = request.count();
-
-        CouponCount couponCount = new CouponCount(type, count);
-        couponCountRepository.save(couponCount);
-        List<CreatedCoupon> createdCoupons = createCoupon(type, count);
-
-        return new CouponCreateResponse(createdCoupons);
+        saveCouponCount(type, count);
+        createCoupon(type, count);
     }
 
-    private List<CreatedCoupon> createCoupon(Type type, int count) {
-        List<CreatedCoupon> createdCoupons = new ArrayList<>();
+    private void saveCouponCount(final Type type, final int count) {
+        CouponCount couponCount = new CouponCount(type, count);
+        couponCountRepository.save(couponCount);
+    }
+
+    private void createCoupon(final Type type, final int count) {
+        List<Coupon> coupons = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Coupon coupon = new Coupon(type);
-            couponRepository.save(coupon);
-            createdCoupons.add(new CreatedCoupon(coupon.getId(), type));
+            coupons.add(coupon);
         }
-        return createdCoupons;
+        couponRepository.saveAll(coupons);
     }
 }
