@@ -14,6 +14,7 @@ public enum ErrorCode {
     PASSWORD_FORMAT_EXCEPTION(HttpStatus.BAD_REQUEST, "비밀번호 형식이 틀렸습니다."),
     // 401 Error
     PASSWORD_INVALID(HttpStatus.UNAUTHORIZED, "비밀번호가 틀렸습니다."),
+    UNAUTHORIZED_MEMBER(HttpStatus.UNAUTHORIZED, "관리자만 접근 가능합니다."),
     // 404 Error
     MEMBER_NOTFOUND(HttpStatus.NOT_FOUND, "회원을 찾을 수 없습니다.");
     ;

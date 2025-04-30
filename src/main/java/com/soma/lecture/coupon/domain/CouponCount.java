@@ -17,9 +17,6 @@ import lombok.NoArgsConstructor;
 public class CouponCount {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Type type;
