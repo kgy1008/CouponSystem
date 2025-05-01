@@ -12,6 +12,7 @@ import com.soma.lecture.users.service.response.UserLoginResponse;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class UserService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public void signUp(final MemberRequest request) {
         checkDuplicated(request.email());
         String encodedPassword = generateEncodedPassword(request.password());
@@ -31,6 +33,7 @@ public class UserService {
         memberRepository.save(member);
     }
 
+    @Transactional(readOnly = true)
     public UserLoginResponse login(final MemberRequest request) {
         Member member = validateInfo(request.email(), request.password());
         return new UserLoginResponse(member.getUserUuid(), member.getRole());

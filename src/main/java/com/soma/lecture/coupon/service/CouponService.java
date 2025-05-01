@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class CouponService {
     private final CouponCountRepository couponCountRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional
     public void createCoupons(final String uuid, final CouponCreateRequest request) {
         isUserAuthorized(uuid);
         Type type = Type.from(request.type());
