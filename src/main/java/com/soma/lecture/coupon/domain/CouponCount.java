@@ -26,4 +26,8 @@ public class CouponCount {
         this.type = type;
         this.remainCount = totalCount;
     }
+
+    public void updateRemainCount(final int count) {
+        this.remainCount += count;
+    }
 }
