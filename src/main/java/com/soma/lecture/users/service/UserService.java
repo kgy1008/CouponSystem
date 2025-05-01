@@ -9,7 +9,6 @@ import com.soma.lecture.users.controller.request.MemberRequest;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.repository.MemberRepository;
 import com.soma.lecture.users.service.response.UserLoginResponse;
-import jakarta.validation.Valid;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +31,7 @@ public class UserService {
         memberRepository.save(member);
     }
 
-    public UserLoginResponse login(final @Valid MemberRequest request) {
+    public UserLoginResponse login(final MemberRequest request) {
         Member member = validateInfo(request.email(), request.password());
         return new UserLoginResponse(member.getUserUuid(), member.getRole());
     }
@@ -53,6 +52,7 @@ public class UserService {
         if (rawPassword.length() < PASSWORD_MIN_LENGTH || rawPassword.length() > PASSWORD_MAX_LENGTH) {
             throw new BadRequestException(ErrorCode.PASSWORD_LENGTH_EXCEPTION);
         }
+
         if (!VALID_PASSWORD_PATTERN.matcher(rawPassword).matches()) {
             throw new BadRequestException(ErrorCode.PASSWORD_FORMAT_EXCEPTION);
         }
@@ -60,7 +60,6 @@ public class UserService {
 
     private Member validateInfo(final String email, final String password) {
         Member member = findMemberByEmail(email);
-
         if (!passwordEncoder.matches(password, member.getPassword())) {
             throw new UnauthorizedException(ErrorCode.PASSWORD_INVALID);
         }
