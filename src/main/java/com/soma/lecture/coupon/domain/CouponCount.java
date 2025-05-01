@@ -20,14 +20,10 @@ public class CouponCount {
     private Type type;
 
     @Column(nullable = false)
-    private int totalCount = 0;
-
-    @Column(nullable = false)
     private int remainCount = 0;
 
     public CouponCount(final Type type, final int totalCount) {
         this.type = type;
-        this.totalCount = totalCount;
         this.remainCount = totalCount;
     }
 }

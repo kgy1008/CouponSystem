@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,12 +29,14 @@ public class CouponService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void createCoupons(final String uuid, final CouponCreateRequest request) {
+    @CachePut(value = "couponCount", key = "#request.type()", cacheManager = "cacheManager")
+    public CouponCount createCoupons(final String uuid, final CouponCreateRequest request) {
         isUserAuthorized(uuid);
         Type type = Type.from(request.type());
         int count = request.count();
-        saveCouponCount(type, count);
+        CouponCount couponCount = saveCouponCount(type, count);
         createCoupon(type, count);
+        return couponCount;
     }
 
     private void isUserAuthorized(final String userUUID) {
@@ -49,9 +52,9 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
     }
 
-    private void saveCouponCount(final Type type, final int count) {
+    public CouponCount saveCouponCount(final Type type, final int count) {
         CouponCount couponCount = new CouponCount(type, count);
-        couponCountRepository.save(couponCount);
+        return couponCountRepository.save(couponCount);
     }
 
     private void createCoupon(final Type type, final int count) {
