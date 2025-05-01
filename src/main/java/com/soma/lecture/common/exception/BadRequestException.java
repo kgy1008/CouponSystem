@@ -11,5 +11,4 @@ public class BadRequestException extends RuntimeException {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
     }
-
 }

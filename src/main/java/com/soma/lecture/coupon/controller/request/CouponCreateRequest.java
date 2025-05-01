@@ -2,7 +2,6 @@ package com.soma.lecture.coupon.controller.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import java.util.UUID;
 
 public record CouponCreateRequest(
         @NotBlank(message = "쿠폰 타입을 입력해주세요")

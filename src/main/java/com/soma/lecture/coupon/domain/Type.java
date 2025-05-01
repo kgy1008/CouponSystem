@@ -1,5 +1,7 @@
 package com.soma.lecture.coupon.domain;
 
+import com.soma.lecture.common.exception.BadRequestException;
+import com.soma.lecture.common.response.ErrorCode;
 import java.util.Arrays;
 
 public enum Type {
@@ -17,7 +19,6 @@ public enum Type {
         return Arrays.stream(values())
                 .filter(n -> n.name().equalsIgnoreCase(name))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 쿠폰 타입입니다: " + name));
+                .orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_COUPON_TYPE));
     }
-
 }

@@ -5,7 +5,6 @@ import com.soma.lecture.common.response.SuccessCode;
 import com.soma.lecture.coupon.controller.request.CouponCreateRequest;
 import com.soma.lecture.coupon.service.CouponService;
 import jakarta.validation.Valid;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,5 +24,4 @@ public class CouponController {
         couponService.createCoupons(userUUID, request);
         return ApiResponse.success(SuccessCode.COUPON_CREATED);
     }
-
 }
