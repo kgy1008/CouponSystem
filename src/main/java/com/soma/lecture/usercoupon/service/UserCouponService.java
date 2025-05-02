@@ -3,6 +3,7 @@ package com.soma.lecture.usercoupon.service;
 import com.soma.lecture.common.exception.BadRequestException;
 import com.soma.lecture.common.exception.ConflictException;
 import com.soma.lecture.common.exception.NotFoundException;
+import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.Coupon;
 import com.soma.lecture.coupon.domain.Type;
@@ -15,6 +16,7 @@ import com.soma.lecture.usercoupon.service.response.CouponIssueResponse;
 import com.soma.lecture.usercoupon.service.response.CouponReadResponse;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.repository.MemberRepository;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,6 +57,26 @@ public class UserCouponService {
         return CouponReadResponse.from(coupons);
     }
 
+    @Transactional
+    public void use(final UUID userUuid, final UUID couponUuid) {
+        Member member = findMemberByUuid(userUuid);
+        Coupon coupon = findCouponByUuid(couponUuid);
+        UserCoupon userCoupon = validateUserCoupon(member, coupon);
+        userCoupon.useCoupon();
+    }
+
+    private UserCoupon validateUserCoupon(final Member member, final Coupon coupon) {
+        UserCoupon userCoupon = findUserCoupon(member, coupon);
+        if (userCoupon.isUsed()) {
+            throw new BadRequestException(ErrorCode.COUPON_ALREADY_USED);
+        }
+
+        if (coupon.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorCode.COUPON_EXPIRED);
+        }
+        return userCoupon;
+    }
+
     private UUID assignCouponToMember(final Type type, final Member member) {
         UUID couponUuid = popCouponUuidFromRedis(type);
         Coupon coupon = findCouponByUuid(couponUuid);
@@ -70,16 +92,6 @@ public class UserCouponService {
                 .orElseThrow(() -> new BadRequestException(ErrorCode.COUPON_SOLD_OUT));
     }
 
-    private Member findMemberByUuid(final UUID uuid) {
-        return memberRepository.findByUserUuid(uuid)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
-    }
-
-    private Coupon findCouponByUuid(final UUID uuid) {
-        return couponRepository.findByCouponUuid(uuid)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOTFOUND));
-    }
-
     private void validateUser(final Member member) {
         boolean exists = userCouponRepository.existsByUser(member);
         if (exists) {
@@ -92,5 +104,20 @@ public class UserCouponService {
         if (couponCount <= MIN_COUPON_COUNT) {
             throw new BadRequestException(ErrorCode.COUPON_SOLD_OUT);
         }
+    }
+
+    private Member findMemberByUuid(final UUID uuid) {
+        return memberRepository.findByUserUuid(uuid)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
+    }
+
+    private Coupon findCouponByUuid(final UUID uuid) {
+        return couponRepository.findByCouponUuid(uuid)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOTFOUND));
+    }
+
+    private UserCoupon findUserCoupon(final Member member, final Coupon coupon) {
+        return userCouponRepository.findByUserAndCoupon(member, coupon)
+                .orElseThrow(() -> new UnauthorizedException(ErrorCode.UNAUTHORIZED_COUPON_ACCESS));
     }
 }

@@ -34,4 +34,10 @@ public class UserCouponController {
         CouponReadResponse response = userCouponService.read(userUuid);
         return ApiResponse.success(SuccessCode.COUPON_READ, response);
     }
+
+    @PostMapping("/{userUuid}/{couponUuid}")
+    public ApiResponse<Void> useCoupon(@PathVariable UUID userUuid, @PathVariable UUID couponUuid) {
+        userCouponService.use(userUuid, couponUuid);
+        return ApiResponse.success(SuccessCode.COUPON_USED);
+    }
 }
