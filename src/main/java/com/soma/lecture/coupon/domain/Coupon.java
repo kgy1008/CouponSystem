@@ -36,7 +36,7 @@ public class Coupon extends BaseEntity {
     @Column(nullable = false)
     private UUID couponUuid = UUID.randomUUID();
 
-    public Coupon(Type type) {
+    public Coupon(final Type type) {
         this.type = type;
         this.expiredAt = LocalDateTime.now().plusDays(COUPON_VALIDITY_DAYS);
     }

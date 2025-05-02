@@ -1,11 +1,13 @@
 package com.soma.lecture.usercoupon.facade;
 
 import com.soma.lecture.common.exception.BadRequestException;
+import com.soma.lecture.common.exception.ConflictException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.service.CouponCountService;
 import com.soma.lecture.usercoupon.controller.request.CouponIssueRequest;
 import com.soma.lecture.usercoupon.domain.UserCoupon;
+import com.soma.lecture.usercoupon.service.RedisLockService;
 import com.soma.lecture.usercoupon.service.UserCouponService;
 import com.soma.lecture.usercoupon.service.response.CouponIssueResponse;
 import com.soma.lecture.usercoupon.service.response.CouponReadResponse;
@@ -23,15 +25,25 @@ public class UserCouponFacade {
 
     private final UserCouponService userCouponService;
     private final CouponCountService couponCountService;
+    private final RedisLockService redisLockService;
 
     @Transactional
     public CouponIssueResponse issue(final UUID uuid, final CouponIssueRequest request) {
         Type type = Type.from(request.type());
         Member member = userCouponService.validateUser(uuid);
-        checkCouponCount(type);
-        UserCoupon userCoupon = userCouponService.assignCouponToMember(type,member);
-        couponCountService.decreaseCouponCount(type);
-        return new CouponIssueResponse(userCoupon.getCoupon().getCouponUuid(), type);
+
+        if (!redisLockService.lock(uuid.toString())) {
+            throw new ConflictException(ErrorCode.ALREADY_ISSUED);
+        }
+
+        try {
+            checkCouponCount(type);
+            UserCoupon userCoupon = userCouponService.assignCouponToMember(type, member);
+            couponCountService.decreaseCouponCount(type);
+            return new CouponIssueResponse(userCoupon.getCoupon().getCouponUuid(), type);
+        } finally {
+            redisLockService.unlock(uuid.toString());
+        }
     }
 
     @Transactional(readOnly = true)

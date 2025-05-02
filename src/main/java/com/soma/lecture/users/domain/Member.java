@@ -38,7 +38,7 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private UUID userUuid = UUID.randomUUID();
 
-    public Member(String email, String password) {
+    public Member(final String email, final String password) {
         this.email = email;
         this.password = password;
         this.role = DEFAULT_ROLE;
