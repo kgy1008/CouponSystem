@@ -14,7 +14,7 @@ import com.soma.lecture.usercoupon.domain.repository.UserCouponRepository;
 import com.soma.lecture.usercoupon.service.response.CouponIssueResponse;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.repository.MemberRepository;
-import jakarta.validation.Valid;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -35,23 +35,31 @@ public class UserCouponService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public CouponIssueResponse issue(final String userUUID, final @Valid CouponIssueRequest request) {
+    public CouponIssueResponse issue(final String userUUID, final CouponIssueRequest request) {
         UUID uuid = UUID.fromString(userUUID);
         Member member = findMemberByUuid(uuid);
         validateUser(member);
+
         Type type = Type.from(request.type());
-        int couponCount = couponCountService.readCouponCount(type);
-        checkCouponCount(couponCount);
+        checkCouponCount(type);
 
-        // Redis에서 쿠폰 발급
-        String couponQueueKey = COUPON_QUEUE + type.name();
-        UUID couponUuid = UUID.fromString(redisTemplate.opsForList().leftPop(couponQueueKey));
-        Coupon coupon = findCouponByUuid(couponUuid);
-        UserCoupon userCoupon = new UserCoupon(coupon, member);
-        userCouponRepository.save(userCoupon);
-
-        couponCountService.decreaseCouponCount(type);
+        UUID couponUuid = assignCouponToMember(type, member);
         return new CouponIssueResponse(couponUuid, type);
+    }
+
+    private UUID assignCouponToMember(final Type type, final Member member) {
+        UUID couponUuid = popCouponUuidFromRedis(type);
+        Coupon coupon = findCouponByUuid(couponUuid);
+        userCouponRepository.save(new UserCoupon(coupon, member));
+        couponCountService.decreaseCouponCount(type);
+        return couponUuid;
+    }
+
+    private UUID popCouponUuidFromRedis(final Type type) {
+        String couponQueueKey = COUPON_QUEUE + type.name();
+        return Optional.ofNullable(redisTemplate.opsForList().leftPop(couponQueueKey))
+                .map(UUID::fromString)
+                .orElseThrow(() -> new BadRequestException(ErrorCode.COUPON_SOLD_OUT));
     }
 
     private Member findMemberByUuid(final UUID uuid) {
@@ -71,7 +79,8 @@ public class UserCouponService {
         }
     }
 
-    private void checkCouponCount(final int couponCount) {
+    private void checkCouponCount(final Type type) {
+        int couponCount = couponCountService.readCouponCount(type);
         if (couponCount <= MIN_COUPON_COUNT) {
             throw new BadRequestException(ErrorCode.COUPON_SOLD_OUT);
         }
