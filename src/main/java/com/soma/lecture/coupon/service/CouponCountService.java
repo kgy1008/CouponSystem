@@ -20,7 +20,7 @@ public class CouponCountService {
 
     private static final String COUPON_COUNT_KEY = "couponCount";
 
-    public void saveCouponCount(final Type type, final int count) {
+    public void updateCouponCount(final Type type, final int count) {
         CouponCount couponCount = couponCountRepository.findByType(type)
                 .map(existing -> {
                     existing.updateRemainCount(count);
@@ -29,7 +29,7 @@ public class CouponCountService {
                 .orElseGet(() -> new CouponCount(type, count));
 
         couponCountRepository.save(couponCount);
-        redisTemplate.opsForHash().put(COUPON_COUNT_KEY, type.name(), count);
+        redisTemplate.opsForHash().put(COUPON_COUNT_KEY, type.name(), couponCount.getRemainCount());
     }
 
     public int readCouponCount(final Type type) {

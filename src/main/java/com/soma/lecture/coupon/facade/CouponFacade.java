@@ -21,6 +21,6 @@ public class CouponFacade {
         Type type = Type.from(request.type());
         int count = request.count();
         couponService.createCoupons(uuid, type, count);
-        couponCountService.saveCouponCount(type, count);
+        couponCountService.updateCouponCount(type, count);
     }
 }
