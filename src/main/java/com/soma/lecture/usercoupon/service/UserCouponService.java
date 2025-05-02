@@ -8,7 +8,6 @@ import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.Coupon;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.repository.CouponRepository;
-import com.soma.lecture.coupon.service.CouponCountService;
 import com.soma.lecture.usercoupon.domain.UserCoupon;
 import com.soma.lecture.usercoupon.repository.UserCouponRepository;
 import com.soma.lecture.usercoupon.service.response.CouponReadResponse;
@@ -27,10 +26,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserCouponService {
 
-    private static final int MIN_COUPON_COUNT = 0;
     private static final String COUPON_QUEUE = "coupon_queue:";
+    private static final String ISSUED_USER = "issued_users";
 
-    private final CouponCountService couponCountService;
     private final UserCouponRepository userCouponRepository;
     private final MemberRepository memberRepository;
     private final CouponRepository couponRepository;
@@ -39,8 +37,8 @@ public class UserCouponService {
     @Transactional(readOnly = true)
     public Member validateUser(final UUID uuid) {
         Member member = findMemberByUuid(uuid);
-        boolean exists = userCouponRepository.existsByUser(member);
-        if (exists) {
+        Boolean isIssued = redisTemplate.opsForSet().isMember(ISSUED_USER, uuid.toString());
+        if (Boolean.TRUE.equals(isIssued)) {
             throw new ConflictException(ErrorCode.ALREADY_ISSUED);
         }
         return member;
@@ -52,6 +50,8 @@ public class UserCouponService {
         Coupon coupon = findCouponByUuid(couponUuid);
         UserCoupon userCoupon = new UserCoupon(coupon, member);
         userCouponRepository.save(userCoupon);
+        // Redis에 발급 받은 UserUUID 저장
+        redisTemplate.opsForSet().add(ISSUED_USER, member.getUserUuid().toString());
         return userCoupon;
     }
 
