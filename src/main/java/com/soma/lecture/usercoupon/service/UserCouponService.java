@@ -12,8 +12,10 @@ import com.soma.lecture.usercoupon.controller.request.CouponIssueRequest;
 import com.soma.lecture.usercoupon.domain.UserCoupon;
 import com.soma.lecture.usercoupon.domain.repository.UserCouponRepository;
 import com.soma.lecture.usercoupon.service.response.CouponIssueResponse;
+import com.soma.lecture.usercoupon.service.response.CouponReadResponse;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.repository.MemberRepository;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +37,7 @@ public class UserCouponService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public CouponIssueResponse issue(final String userUUID, final CouponIssueRequest request) {
-        UUID uuid = UUID.fromString(userUUID);
+    public CouponIssueResponse issue(final UUID uuid, final CouponIssueRequest request) {
         Member member = findMemberByUuid(uuid);
         validateUser(member);
 
@@ -45,6 +46,13 @@ public class UserCouponService {
 
         UUID couponUuid = assignCouponToMember(type, member);
         return new CouponIssueResponse(couponUuid, type);
+    }
+
+    @Transactional(readOnly = true)
+    public CouponReadResponse read(final UUID uuid) {
+        Member member = findMemberByUuid(uuid);
+        List<UserCoupon> coupons = userCouponRepository.findByUserAndIsUsed(member, false);
+        return CouponReadResponse.from(coupons);
     }
 
     private UUID assignCouponToMember(final Type type, final Member member) {

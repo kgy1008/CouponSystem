@@ -30,7 +30,7 @@ public class CouponService {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public void createCoupons(final String uuid, final CouponCreateRequest request) {
+    public void createCoupons(final UUID uuid, final CouponCreateRequest request) {
         isUserAuthorized(uuid);
         Type type = Type.from(request.type());
         int count = request.count();
@@ -38,8 +38,7 @@ public class CouponService {
         createCoupon(type, count);
     }
 
-    private void isUserAuthorized(final String userUUID) {
-        UUID uuid = UUID.fromString(userUUID);
+    private void isUserAuthorized(final UUID uuid) {
         Member member = findMember(uuid);
         if (member.getRole() == Role.MEMBER) {
             throw new UnauthorizedException(ErrorCode.UNAUTHORIZED_MEMBER);
