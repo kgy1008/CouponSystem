@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,9 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CouponService {
 
+    private static final String COUPON_QUEUE = "coupon_queue:";
+
     private final CouponCountService couponCountService;
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional
     public void createCoupons(final String uuid, final CouponCreateRequest request) {
@@ -47,7 +51,6 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
     }
 
-
     private void createCoupon(final Type type, final int count) {
         List<Coupon> coupons = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -55,5 +58,12 @@ public class CouponService {
             coupons.add(coupon);
         }
         couponRepository.saveAll(coupons);
+        saveCouponInRedis(coupons);
+    }
+
+    private void saveCouponInRedis(final List<Coupon> coupons) {
+        for (Coupon coupon : coupons) {
+            redisTemplate.opsForList().leftPush(COUPON_QUEUE + coupon.getType(), coupon.getCouponUuid().toString());
+        }
     }
 }
