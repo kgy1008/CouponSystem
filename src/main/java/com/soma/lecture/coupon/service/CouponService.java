@@ -27,7 +27,7 @@ public class CouponService {
     private final CouponCountService couponCountService;
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
     public void createCoupons(final String uuid, final CouponCreateRequest request) {
