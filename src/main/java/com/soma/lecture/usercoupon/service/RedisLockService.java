@@ -33,9 +33,4 @@ public class RedisLockService {
     public void unlock(String key) {
         syncCommands.del(key);
     }
-
-    public void close() {
-        connection.close();
-        redisClient.shutdown();
-    }
 }
