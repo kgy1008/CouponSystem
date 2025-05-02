@@ -1,4 +1,4 @@
-package com.soma.lecture.usercoupon.domain.repository;
+package com.soma.lecture.usercoupon.repository;
 
 import com.soma.lecture.coupon.domain.Coupon;
 import com.soma.lecture.usercoupon.domain.UserCoupon;

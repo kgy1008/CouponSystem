@@ -1,4 +1,4 @@
-package com.soma.lecture.users.domain.repository;
+package com.soma.lecture.users.repository;
 
 import com.soma.lecture.users.domain.Member;
 import java.util.Optional;

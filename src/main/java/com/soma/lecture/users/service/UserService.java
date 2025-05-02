@@ -7,7 +7,7 @@ import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.users.controller.request.MemberRequest;
 import com.soma.lecture.users.domain.Member;
-import com.soma.lecture.users.domain.repository.MemberRepository;
+import com.soma.lecture.users.repository.MemberRepository;
 import com.soma.lecture.users.service.response.UserLoginResponse;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;

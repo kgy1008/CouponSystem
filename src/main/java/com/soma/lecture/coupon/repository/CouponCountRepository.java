@@ -1,4 +1,4 @@
-package com.soma.lecture.coupon.domain.repository;
+package com.soma.lecture.coupon.repository;
 
 import com.soma.lecture.coupon.domain.CouponCount;
 import com.soma.lecture.coupon.domain.Type;

@@ -5,7 +5,7 @@ import com.soma.lecture.common.exception.NotFoundException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.CouponCount;
 import com.soma.lecture.coupon.domain.Type;
-import com.soma.lecture.coupon.domain.repository.CouponCountRepository;
+import com.soma.lecture.coupon.repository.CouponCountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
