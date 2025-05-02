@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class RedisLockService {
 
+    private static final String REDIS_URI = "redis://localhost:6379";
+    private static final String REDIS_LOCK_KEY = "LOCKED";
     private static final String SUCCESS_LOCK = "OK";
 
     private final RedisClient redisClient;
@@ -17,14 +19,14 @@ public class RedisLockService {
     private final RedisCommands<String, String> syncCommands;
 
     public RedisLockService() {
-        RedisURI redisUri = RedisURI.create("redis://localhost:6379");
+        RedisURI redisUri = RedisURI.create(REDIS_URI);
         redisClient = RedisClient.create(redisUri);
         connection = redisClient.connect();
         syncCommands = connection.sync();
     }
 
     public boolean lock(String key) {
-        String result = syncCommands.set(key, "LOCKED", SetArgs.Builder.nx().ex(10));
+        String result = syncCommands.set(key, REDIS_LOCK_KEY, SetArgs.Builder.nx().ex(10));
         return SUCCESS_LOCK.equals(result);
     }
 
