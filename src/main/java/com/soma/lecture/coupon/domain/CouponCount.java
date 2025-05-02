@@ -31,7 +31,7 @@ public class CouponCount {
         this.remainCount += count;
     }
 
-    public void decrementRemainCount() {
-        this.remainCount--;
+    public void decreaseRemainCount(final int count) {
+        this.remainCount = count;
     }
 }

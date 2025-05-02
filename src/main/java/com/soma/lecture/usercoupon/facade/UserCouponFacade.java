@@ -40,6 +40,7 @@ public class UserCouponFacade {
             checkCouponCount(type);
             UserCoupon userCoupon = userCouponService.assignCouponToMember(type, member);
             couponCountService.decreaseCouponCount(type);
+            couponCountService.syncCouponCountsToDb();
             return new CouponIssueResponse(userCoupon.getCoupon().getCouponUuid(), type);
         } finally {
             redisLockService.unlock(uuid.toString());
