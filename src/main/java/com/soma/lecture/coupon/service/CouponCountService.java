@@ -6,6 +6,7 @@ import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.CouponCount;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.repository.CouponCountRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -20,15 +21,16 @@ public class CouponCountService {
     // Write-Through 전략
     @CachePut(value = "couponCount", key = "#type.name()", cacheManager = "cacheManager")
     public int saveCouponCount(final Type type, final int count) {
-        return couponCountRepository.findByType(type)
-                .map(couponCount -> {
-                    couponCount.updateRemainCount(count);
-                    return couponCount.getRemainCount();
-                })
-                .orElseGet(() -> {
-                    couponCountRepository.save(new CouponCount(type, count));
-                    return count;
-                });
+        Optional<CouponCount> optional = couponCountRepository.findByType(type);
+
+        if (optional.isPresent()) {
+            CouponCount couponCount = optional.get();
+            couponCount.updateRemainCount(count);
+            return couponCount.getRemainCount();
+        }
+
+        couponCountRepository.save(new CouponCount(type, count));
+        return count;
     }
 
     @Cacheable(value = "couponCount", key = "#type.name()", cacheManager = "cacheManager")

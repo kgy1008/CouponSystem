@@ -3,7 +3,7 @@ package com.soma.lecture.coupon.controller;
 import com.soma.lecture.common.response.ApiResponse;
 import com.soma.lecture.common.response.SuccessCode;
 import com.soma.lecture.coupon.controller.request.CouponCreateRequest;
-import com.soma.lecture.coupon.service.CouponService;
+import com.soma.lecture.coupon.facade.CouponFacade;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/coupons")
 public class CouponController {
 
-    private final CouponService couponService;
+    private final CouponFacade couponFacade;
 
     @PostMapping("/{userUuid}")
     public ApiResponse<Void> create(@PathVariable UUID userUuid, @RequestBody @Valid CouponCreateRequest request) {
-        couponService.createCoupons(userUuid, request);
+        couponFacade.createCoupons(userUuid, request);
         return ApiResponse.success(SuccessCode.COUPON_CREATED);
     }
 }

@@ -3,7 +3,6 @@ package com.soma.lecture.coupon.service;
 import com.soma.lecture.common.exception.NotFoundException;
 import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
-import com.soma.lecture.coupon.controller.request.CouponCreateRequest;
 import com.soma.lecture.coupon.domain.Coupon;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.repository.CouponRepository;
@@ -24,17 +23,13 @@ public class CouponService {
 
     private static final String COUPON_QUEUE = "coupon_queue:";
 
-    private final CouponCountService couponCountService;
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public void createCoupons(final UUID uuid, final CouponCreateRequest request) {
+    public void createCoupons(final UUID uuid, final Type type, final int count) {
         isUserAuthorized(uuid);
-        Type type = Type.from(request.type());
-        int count = request.count();
-        couponCountService.saveCouponCount(type, count);
         createCoupon(type, count);
     }
 
