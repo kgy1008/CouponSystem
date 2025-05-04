@@ -25,12 +25,12 @@ public class RedisLockService {
         syncCommands = connection.sync();
     }
 
-    public boolean lock(String key) {
+    public boolean lock(final String key) {
         String result = syncCommands.set(key, REDIS_LOCK_KEY, SetArgs.Builder.nx().ex(10));
         return SUCCESS_LOCK.equals(result);
     }
 
-    public void unlock(String key) {
+    public void unlock(final String key) {
         syncCommands.del(key);
     }
 }
