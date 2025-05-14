@@ -42,7 +42,7 @@ public class CouponService {
     private int createCoupon(final Type type, final int count) {
         Coupon coupon = couponRepository.findByType(type)
                 .map(existing -> {
-                    existing.updateRemainCount(count);
+                    existing.increaseCouponCount(count);
                     return existing;
                 })
                 .orElseGet(() -> new Coupon(type, count));

@@ -34,11 +34,11 @@ public class Coupon extends BaseEntity {
         this.remainCount = totalCount;
     }
 
-    public void updateRemainCount(final int count) {
+    public void increaseCouponCount(final int count) {
         this.remainCount += count;
     }
 
-    public void decreaseRemainCount(final int count) {
+    public void updateRemainCount(final int count) {
         this.remainCount = count;
     }
 }
