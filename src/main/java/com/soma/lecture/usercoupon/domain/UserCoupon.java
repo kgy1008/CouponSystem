@@ -55,9 +55,10 @@ public class UserCoupon extends BaseEntity {
     @Column(nullable = true)
     private LocalDateTime usedAt;
 
-    public UserCoupon(final Coupon coupon, final Member user) {
+    public UserCoupon(final Coupon coupon, final Member user, final UUID couponUuid) {
         this.coupon = coupon;
         this.user = user;
+        this.couponUuid = couponUuid;
     }
 
     public void useCoupon() {

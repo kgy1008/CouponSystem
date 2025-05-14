@@ -23,11 +23,19 @@ public class UserCouponRedisService {
         }
     }
 
-    public void persistCouponIssueToRedis(final UUID userCouponUUID, final String type, final UUID userUUID) {
+    void persistCouponIssueToRedis(final UUID userCouponUUID, final String type, final UUID userUUID) {
         // Redis Set 자료구조를 활용하여 발급 완료한 UserUUID 저장
         recordUserUUIDToSet(userUUID);
         // Redis List 자료구조를 활용하여 발급 받은 쿠폰 UUID Push
         enqueueIssuedCoupon(userCouponUUID, type);
+    }
+
+    UUID pollIssuedCouponUUID(final String type) {
+        String couponUUID = redisTemplate.opsForList().leftPop(COUPON_QUEUE + type);
+        if (couponUUID == null) {
+            return null;
+        }
+        return UUID.fromString(couponUUID);
     }
 
     private void recordUserUUIDToSet(final UUID uuid) {

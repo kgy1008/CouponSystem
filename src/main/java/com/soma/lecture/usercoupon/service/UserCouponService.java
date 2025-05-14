@@ -5,7 +5,6 @@ import com.soma.lecture.common.exception.NotFoundException;
 import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.Type;
-import com.soma.lecture.coupon.service.CouponCountRedisService;
 import com.soma.lecture.usercoupon.domain.UserCoupon;
 import com.soma.lecture.usercoupon.repository.UserCouponRepository;
 import com.soma.lecture.usercoupon.service.response.CouponReadResponse;
@@ -24,7 +23,6 @@ public class UserCouponService {
 
     private static final boolean UNUSED = false;
 
-    private final CouponCountRedisService couponCountRedisService;
     private final UserCouponRepository userCouponRepository;
     private final MemberRepository memberRepository;
     private final UserCouponRedisService userCouponRedisService;

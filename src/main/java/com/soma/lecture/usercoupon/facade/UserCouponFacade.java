@@ -6,6 +6,7 @@ import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.coupon.domain.Type;
 import com.soma.lecture.coupon.service.CouponCountRedisService;
 import com.soma.lecture.usercoupon.controller.request.CouponIssueRequest;
+import com.soma.lecture.usercoupon.service.CouponAsyncProcessor;
 import com.soma.lecture.usercoupon.service.RedisLockService;
 import com.soma.lecture.usercoupon.service.UserCouponService;
 import com.soma.lecture.usercoupon.service.response.CouponIssueResponse;
@@ -25,6 +26,7 @@ public class UserCouponFacade {
     private final UserCouponService userCouponService;
     private final CouponCountRedisService couponCountRedisService;
     private final RedisLockService redisLockService;
+    private final CouponAsyncProcessor couponAsyncProcessor;
 
     @Transactional
     public CouponIssueResponse issue(final UUID uuid, final CouponIssueRequest request) {
@@ -40,6 +42,7 @@ public class UserCouponFacade {
             checkCouponCount(type);
             UUID userCouponUUID = userCouponService.issueCoupon(type, member);
             couponCountRedisService.decreaseCouponCount(type);
+            couponAsyncProcessor.consumeAndCreateUserCoupon(type, member);
             return new CouponIssueResponse(userCouponUUID, type);
         } finally {
             redisLockService.unlock(uuid.toString());
