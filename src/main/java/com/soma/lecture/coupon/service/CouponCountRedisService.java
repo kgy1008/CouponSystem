@@ -1,39 +1,27 @@
 package com.soma.lecture.coupon.service;
 
 import com.soma.lecture.common.exception.BadRequestException;
-import com.soma.lecture.common.exception.NotFoundException;
 import com.soma.lecture.common.response.ErrorCode;
-import com.soma.lecture.coupon.domain.CouponCount;
 import com.soma.lecture.coupon.domain.Type;
-import com.soma.lecture.coupon.repository.CouponCountRepository;
+import com.soma.lecture.coupon.repository.CouponRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class CouponCountService {
+public class CouponCountRedisService {
 
     private static final int MIN_COUPON_COUNT = 0;
 
-    private final CouponCountRepository couponCountRepository;
+    private final CouponRepository couponRepository;
     private final RedisTemplate<String, String> redisTemplate;
 
     private static final String COUPON_COUNT_KEY = "couponCount:";
 
-    public void updateCouponCount(final Type type, final int count) {
-        CouponCount couponCount = couponCountRepository.findByType(type)
-                .map(existing -> {
-                    existing.updateRemainCount(count);
-                    return existing;
-                })
-                .orElseGet(() -> new CouponCount(type, count));
-
-        couponCountRepository.save(couponCount);
-        redisTemplate.opsForValue().set(getCouponKey(type), String.valueOf(couponCount.getRemainCount()));
+    public void cacheCouponCount(final Type type, final int count) {
+        redisTemplate.opsForValue().set(getCouponKey(type), String.valueOf(count));
     }
 
     public int readCouponCount(final Type type) {
@@ -49,29 +37,13 @@ public class CouponCountService {
         }
     }
 
-    @Scheduled(fixedRate = 5000)
-    @Transactional
-    public void syncCouponCountsToDb() {
-        for (Type type : Type.values()) {
-            String key = getCouponKey(type);
-            String countStr = redisTemplate.opsForValue().get(key);
-            if (countStr == null) continue;
-
-            long remainCount = Long.parseLong(countStr);
-            CouponCount couponCount = couponCountRepository.findByType(type)
-                    .orElseThrow(() -> new NotFoundException(ErrorCode.INVALID_COUPON_TYPE));
-
-            couponCount.decreaseRemainCount((int) remainCount);
-        }
-    }
-
     private Optional<Integer> getCachedCouponCount(final Type type) {
         String value = redisTemplate.opsForValue().get(getCouponKey(type));
         return Optional.ofNullable(value).map(Integer::parseInt);
     }
 
     private int loadFromDatabase(final Type type) {
-        int count = couponCountRepository.findByType(type)
+        int count = couponRepository.findByType(type)
                 .orElseThrow(() -> new BadRequestException(ErrorCode.INVALID_COUPON_TYPE))
                 .getRemainCount();
         redisTemplate.opsForValue().set(getCouponKey(type), String.valueOf(count));

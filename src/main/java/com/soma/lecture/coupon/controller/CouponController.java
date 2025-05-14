@@ -7,22 +7,23 @@ import com.soma.lecture.coupon.facade.CouponFacade;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/coupons")
+@RequestMapping("/api/v1")
 public class CouponController {
 
     private final CouponFacade couponFacade;
 
-    @PostMapping("/{userUuid}")
-    public ApiResponse<Void> create(@PathVariable UUID userUuid, @RequestBody @Valid CouponCreateRequest request) {
-        couponFacade.createCoupons(userUuid, request);
+    @PostMapping("/coupons")
+    public ApiResponse<Void> create(@RequestHeader("X-User-UUID") UUID userUUID,
+                                    @RequestBody @Valid CouponCreateRequest request) {
+        couponFacade.createCoupons(userUUID, request);
         return ApiResponse.success(SuccessCode.COUPON_CREATED);
     }
 }

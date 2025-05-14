@@ -9,11 +9,8 @@ import com.soma.lecture.coupon.repository.CouponRepository;
 import com.soma.lecture.users.domain.Member;
 import com.soma.lecture.users.domain.Role;
 import com.soma.lecture.users.repository.MemberRepository;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,16 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CouponService {
 
-    private static final String COUPON_QUEUE = "coupon_queue:";
-
     private final CouponRepository couponRepository;
     private final MemberRepository memberRepository;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Transactional
-    public void createCoupons(final UUID uuid, final Type type, final int count) {
+    public int createCoupons(final UUID uuid, final Type type, final int count) {
         isUserAuthorized(uuid);
-        createCoupon(type, count);
+        return createCoupon(type, count);
     }
 
     private void isUserAuthorized(final UUID uuid) {
@@ -45,19 +39,14 @@ public class CouponService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOTFOUND));
     }
 
-    private void createCoupon(final Type type, final int count) {
-        List<Coupon> coupons = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            Coupon coupon = new Coupon(type);
-            coupons.add(coupon);
-        }
-        couponRepository.saveAll(coupons);
-        saveCouponInRedis(coupons);
-    }
-
-    private void saveCouponInRedis(final List<Coupon> coupons) {
-        for (Coupon coupon : coupons) {
-            redisTemplate.opsForList().leftPush(COUPON_QUEUE + coupon.getType(), coupon.getCouponUuid().toString());
-        }
+    private int createCoupon(final Type type, final int count) {
+        Coupon coupon = couponRepository.findByType(type)
+                .map(existing -> {
+                    existing.updateRemainCount(count);
+                    return existing;
+                })
+                .orElseGet(() -> new Coupon(type, count));
+        couponRepository.save(coupon);
+        return coupon.getRemainCount();
     }
 }

@@ -5,11 +5,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import java.time.LocalDateTime;
-import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,22 +19,26 @@ public class Coupon extends BaseEntity {
     private static final int COUPON_VALIDITY_DAYS = 60;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "coupon_id")
-    private Long id;
-
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Type type;
 
     @Column(nullable = false)
-    private LocalDateTime expiredAt;
+    private int remainCount = 0;
 
     @Column(nullable = false)
-    private UUID couponUuid = UUID.randomUUID();
+    private LocalDateTime expired_at = LocalDateTime.now().plusDays(COUPON_VALIDITY_DAYS);
 
-    public Coupon(final Type type) {
+    public Coupon(final Type type, final int totalCount) {
         this.type = type;
-        this.expiredAt = LocalDateTime.now().plusDays(COUPON_VALIDITY_DAYS);
+        this.remainCount = totalCount;
+    }
+
+    public void updateRemainCount(final int count) {
+        this.remainCount += count;
+    }
+
+    public void decreaseRemainCount(final int count) {
+        this.remainCount = count;
     }
 }

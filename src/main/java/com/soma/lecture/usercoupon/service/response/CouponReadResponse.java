@@ -8,7 +8,7 @@ public record CouponReadResponse(
 ) {
     public static CouponReadResponse from(final List<UserCoupon> coupons) {
         List<UserCouponVo> result = coupons.stream()
-                .map(userCoupon -> new UserCouponVo(userCoupon.getCoupon().getCouponUuid(), userCoupon.getCoupon().getType()))
+                .map(userCoupon -> new UserCouponVo(userCoupon.getCouponUuid(), userCoupon.getCoupon().getType()))
                 .toList();
         return new CouponReadResponse(result);
     }
