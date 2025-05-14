@@ -1,0 +1,18 @@
+### 유저 가입
+POST localhost:8080/api/v1/users/signup
+Content-Type: application/json
+
+{
+  "email": "sdkf@gmai.com",
+  "password": "sdkjf$1dfs"
+}
+
+### 유저 로그인
+POST localhost:8080/api/v1/users/login
+Content-Type: application/json
+
+{
+  "email": "sdkf@gmai.com",
+  "password": "sdkjf$1dfs"
+}
+
