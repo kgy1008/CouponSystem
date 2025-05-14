@@ -1,0 +1,19 @@
+### 쿠폰 발급
+POST localhost:8080/api/v1/user-coupons
+Content-Type: application/json
+X-User-UUID: 9c9509be-00e8-48bb-8922-e50a04083d8f
+
+{
+  "type": "pizza"
+}
+
+### 사용하지 않은 쿠폰 조회
+GET localhost:8080/api/v1/user-coupons
+Content-Type: application/json
+X-User-UUID: 9c9509be-00e8-48bb-8922-e50a04083d8f
+
+### 쿠폰 사용
+POST localhost:8080/api/v1/user-coupons/67c744aa-651e-4447-bc38-5c9fecc91a6e
+Content-Type: application/json
+X-User-UUID: 9c9509be-00e8-48bb-8922-e50a04083d8f
+
