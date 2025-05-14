@@ -10,10 +10,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +28,7 @@ import lombok.NoArgsConstructor;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "user_coupon_UN",
-                        columnNames = {"user_id", "coupon_id"}
+                        columnNames = {"user_id", "coupon_type"}
                 )
         }
 ) // 유니크 제약 조건 설정
@@ -36,13 +38,16 @@ public class UserCoupon extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_type", nullable = false)
     private Coupon coupon;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private Member user;
+
+    @Column(nullable = false)
+    private UUID couponUuid;
 
     @Column(nullable = false)
     private boolean isUsed = false;
@@ -57,5 +62,6 @@ public class UserCoupon extends BaseEntity {
 
     public void useCoupon() {
         this.isUsed = true;
+        this.usedAt = LocalDateTime.now();
     }
 }

@@ -13,31 +13,33 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user-coupons")
+@RequestMapping("/api/v1")
 public class UserCouponController {
 
     private final UserCouponFacade userCouponFacade;
 
-    @PostMapping("/{userUuid}")
-    public ApiResponse<CouponIssueResponse> issue(@PathVariable UUID userUuid, @RequestBody @Valid CouponIssueRequest request) {
-        CouponIssueResponse response = userCouponFacade.issue(userUuid, request);
+    @PostMapping("/user-coupons")
+    public ApiResponse<CouponIssueResponse> issue(@RequestHeader("X-User-UUID") UUID userUUID,
+                                                  @RequestBody @Valid CouponIssueRequest request) {
+        CouponIssueResponse response = userCouponFacade.issue(userUUID, request);
         return ApiResponse.success(SuccessCode.COUPON_ISSUED, response);
     }
 
-    @GetMapping("/{userUuid}")
-    public ApiResponse<CouponReadResponse> readMyCoupon(@PathVariable UUID userUuid) {
-        CouponReadResponse response = userCouponFacade.read(userUuid);
+    @GetMapping("/user-coupons")
+    public ApiResponse<CouponReadResponse> readMyCoupon(@RequestHeader("X-User-UUID") UUID userUUID) {
+        CouponReadResponse response = userCouponFacade.read(userUUID);
         return ApiResponse.success(SuccessCode.COUPON_READ, response);
     }
 
-    @PostMapping("/{userUuid}/{couponUuid}")
-    public ApiResponse<Void> useCoupon(@PathVariable UUID userUuid, @PathVariable UUID couponUuid) {
-        userCouponFacade.use(userUuid, couponUuid);
+    @PostMapping("/user-coupons/{couponUuid}")
+    public ApiResponse<Void> useCoupon(@RequestHeader("X-User-UUID") UUID userUUID, @PathVariable UUID couponUuid) {
+        userCouponFacade.use(userUUID, couponUuid);
         return ApiResponse.success(SuccessCode.COUPON_USED);
     }
 }
