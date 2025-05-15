@@ -34,7 +34,8 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// Database
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.mysql:mysql-connector-j'   // 운영/로컬용 MySQL
+	testRuntimeOnly 'com.h2database:h2'          // 테스트용 H2 추가
 
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'

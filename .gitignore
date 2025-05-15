@@ -43,4 +43,5 @@ out/
 .vscode/
 
 ### yaml ###
-application.yml
+application-local.yml
+application-test.yml
