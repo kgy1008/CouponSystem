@@ -7,6 +7,7 @@ import com.soma.lecture.common.exception.UnauthorizedException;
 import com.soma.lecture.common.response.ErrorCode;
 import com.soma.lecture.users.controller.request.MemberRequest;
 import com.soma.lecture.users.domain.Member;
+import com.soma.lecture.users.domain.Role;
 import com.soma.lecture.users.repository.MemberRepository;
 import com.soma.lecture.users.service.response.UserLoginResponse;
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private static final int PASSWORD_MIN_LENGTH = 8;
     private static final int PASSWORD_MAX_LENGTH = 15;
+    private static final Role DEFAULT_ROLE = Role.MEMBER;
     private static final Pattern VALID_PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>/?]).*$");
 
@@ -29,7 +31,7 @@ public class UserService {
     public void signUp(final MemberRequest request) {
         checkDuplicated(request.email());
         String encodedPassword = generateEncodedPassword(request.password());
-        Member member = new Member(request.email(), encodedPassword);
+        Member member = new Member(request.email(), encodedPassword, DEFAULT_ROLE);
         memberRepository.save(member);
     }
 
@@ -51,7 +53,7 @@ public class UserService {
         return passwordEncoder.encode(rawPassword);
     }
 
-    private void validatePassword(final String rawPassword) {
+    void validatePassword(final String rawPassword) {
         if (rawPassword.length() < PASSWORD_MIN_LENGTH || rawPassword.length() > PASSWORD_MAX_LENGTH) {
             throw new BadRequestException(ErrorCode.PASSWORD_LENGTH_EXCEPTION);
         }

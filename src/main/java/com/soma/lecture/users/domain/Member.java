@@ -18,8 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
-    private static final Role DEFAULT_ROLE = Role.MEMBER;
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -38,9 +36,9 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private UUID userUuid = UUID.randomUUID();
 
-    public Member(final String email, final String password) {
+    public Member(final String email, final String password, final Role role) {
         this.email = email;
         this.password = password;
-        this.role = DEFAULT_ROLE;
+        this.role = role;
     }
 }
