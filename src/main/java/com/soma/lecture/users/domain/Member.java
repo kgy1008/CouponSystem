@@ -34,11 +34,12 @@ public class Member extends BaseEntity {
     private Role role;
 
     @Column(nullable = false)
-    private UUID userUuid = UUID.randomUUID();
+    private UUID userUuid;
 
     public Member(final String email, final String password, final Role role) {
         this.email = email;
         this.password = password;
         this.role = role;
+        this.userUuid = UUID.randomUUID();
     }
 }
