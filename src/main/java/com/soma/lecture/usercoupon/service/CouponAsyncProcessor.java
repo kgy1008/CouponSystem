@@ -36,7 +36,6 @@ public class CouponAsyncProcessor {
         userCouponRepository.save(userCoupon);
     }
 
-
     private Coupon findCouponByType(final Type type) {
         return couponRepository.findByType(type)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.COUPON_NOTFOUND));

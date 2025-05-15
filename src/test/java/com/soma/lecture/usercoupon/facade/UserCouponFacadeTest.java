@@ -18,7 +18,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,7 +77,6 @@ class UserCouponFacadeTest {
         }
 
         executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.SECONDS);
 
         long successCount = results.stream().filter(f -> {
             try {
@@ -142,7 +140,6 @@ class UserCouponFacadeTest {
         }
 
         executor.shutdown();
-        executor.awaitTermination(5, TimeUnit.SECONDS);
 
         long successCount = results.stream().filter(f -> {
             try {
